@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Work Order Portal — Streamline Innovations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow-x:hidden}
+body{background:#080c14;font-family:'DM Sans',sans-serif;color:#e2e8f0}
+input,textarea,select,button{font-family:inherit}
+input:focus,textarea:focus{outline:none}
+::placeholder{color:#3f4f63}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:2px}
+
+.page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem 1rem}
+.wrap{width:100%;max-width:460px;animation:slideUp .35s ease}
+.card{background:#0f1520;border-radius:10px;padding:1.4rem;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(0,0,0,0.5)}
+
+.badge{display:inline-block;font-size:.55rem;font-weight:700;color:#22c55e;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.4rem;font-family:'JetBrains Mono',monospace;background:rgba(34,197,94,0.06);padding:.25rem .6rem;border-radius:3px;border:1px solid rgba(34,197,94,0.12)}
+h1{font-size:1.3rem;font-weight:700;color:#f1f5f9}
+.subtitle{font-size:.62rem;color:#334155;margin-top:.2rem;font-family:'JetBrains Mono',monospace}
+
+.field{margin-bottom:1.25rem;position:relative}
+.label{display:block;font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#475569;margin-bottom:.3rem;font-family:'JetBrains Mono',monospace}
+.input-wrap{border:1.5px solid rgba(255,255,255,0.08);border-radius:8px;background:rgba(255,255,255,0.015);transition:all .2s;position:relative}
+.input-wrap.focused{border-color:#22c55e;box-shadow:0 0 0 2px rgba(34,197,94,0.12)}
+.input-wrap.disabled{opacity:0.4;pointer-events:none}
+.input-wrap input,.input-wrap textarea{width:100%;padding:.6rem .8rem;font-size:.85rem;border:none;outline:none;background:transparent;color:#e2e8f0;font-family:'DM Sans',sans-serif}
+.input-wrap textarea{resize:vertical;line-height:1.5;min-height:76px}
+
+.clear-btn{position:absolute;right:.5rem;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.05);border:none;border-radius:3px;width:16px;height:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.55rem;color:#475569;font-weight:700;font-family:monospace}
+
+.dropdown{position:absolute;top:100%;left:0;right:0;z-index:50;background:#162032;border:1px solid rgba(255,255,255,0.06);border-radius:8px;margin-top:2px;max-height:200px;overflow-y:auto;box-shadow:0 10px 32px rgba(0,0,0,0.6);display:none}
+.dropdown.open{display:block}
+.dropdown .item{padding:.5rem .8rem;cursor:pointer;font-size:.8rem;transition:background .1s;border-bottom:1px solid rgba(255,255,255,0.03)}
+.dropdown .item:last-child{border-bottom:none}
+.dropdown .item:hover{background:rgba(34,197,94,0.06)}
+.dropdown .item .name{color:#e2e8f0;font-weight:600}
+.dropdown .item .tag{margin-left:.4rem;font-size:.55rem;color:#22c55e;font-family:'JetBrains Mono',monospace;font-weight:600;letter-spacing:.03em;background:rgba(34,197,94,0.08);padding:.08rem .3rem;border-radius:2px}
+
+.priority-bar{display:flex;gap:.4rem}
+.priority-bar button{flex:1;padding:.5rem;border-radius:6px;border:1.5px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);color:#475569;font-weight:700;font-size:.7rem;cursor:pointer;transition:all .15s;letter-spacing:.04em;text-transform:uppercase}
+
+.upload-zone{border:1.5px dashed rgba(255,255,255,0.08);border-radius:8px;padding:.7rem;text-align:center;cursor:pointer;transition:all .2s;background:rgba(255,255,255,0.01)}
+.upload-zone:hover{border-color:rgba(34,197,94,0.25)}
+.upload-preview{display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap}
+.upload-thumb{position:relative;width:56px;height:56px;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)}
+.upload-thumb img{width:100%;height:100%;object-fit:cover}
+.upload-thumb .rm{position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:rgba(0,0,0,0.75);border:none;color:#fff;font-size:.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:monospace}
+
+.summary{background:rgba(34,197,94,0.03);border-radius:6px;padding:.55rem .75rem;margin-bottom:1.25rem;border:1px solid rgba(34,197,94,0.06);animation:fadeIn .2s ease}
+.summary .stitle{font-size:.55rem;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem;font-family:'JetBrains Mono',monospace}
+.summary .row{font-size:.78rem;color:#94a3b8;line-height:1.6}
+.summary .row strong{color:#e2e8f0}
+.summary .slbl{color:#334155;font-size:.58rem;font-family:'JetBrains Mono',monospace;margin-right:.35rem;font-weight:600}
+
+.submit-btn{width:100%;padding:.7rem;border:none;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.06em;text-transform:uppercase}
+.submit-btn.active{background:#22c55e;color:#052e16;cursor:pointer}
+.submit-btn.inactive{background:rgba(255,255,255,0.03);color:#334155;cursor:not-allowed}
+
+.status-bar{padding:.6rem .85rem;border-radius:6px;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;animation:fadeIn .25s ease}
+.status-bar .btn{background:transparent;border:1px solid rgba(255,255,255,0.1);cursor:pointer;font-weight:700;font-size:.58rem;font-family:inherit;padding:.2rem .5rem;border-radius:3px;letter-spacing:.06em;text-transform:uppercase}
+
+.footer{text-align:center;margin-top:.6rem;font-size:.5rem;color:#1e293b;font-family:'JetBrains Mono',monospace;letter-spacing:.05em}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="wrap">
+
+<!-- Header -->
+<div style="margin-bottom:1.25rem">
+  <div class="badge">Streamline Innovations</div>
+  <h1>Work Order Portal</h1>
+  <p class="subtitle" id="data-status">Connecting to MaintainX...</p>
+</div>
+
+<!-- Card -->
+<div class="card">
+  <div id="status-bar"></div>
+
+  <!-- Name -->
+  <div class="field">
+    <label class="label">Submitted By</label>
+    <div class="input-wrap" id="name-wrap">
+      <input type="text" placeholder="Your name" id="inp-name">
+    </div>
+  </div>
+
+  <!-- Location -->
+  <div class="field" id="loc-field">
+    <label class="label">Location</label>
+    <div class="input-wrap" id="loc-wrap">
+      <input type="text" placeholder="Type to search locations..." id="inp-loc" autocomplete="off">
+      <button class="clear-btn" id="loc-clear" style="display:none">x</button>
+    </div>
+    <div class="dropdown" id="loc-dropdown"></div>
+  </div>
+
+  <!-- Asset -->
+  <div class="field" id="asset-field">
+    <label class="label">Asset</label>
+    <div class="input-wrap disabled" id="asset-wrap">
+      <input type="text" placeholder="Select a location first" id="inp-asset" autocomplete="off" disabled>
+      <button class="clear-btn" id="asset-clear" style="display:none">x</button>
+    </div>
+    <div class="dropdown" id="asset-dropdown"></div>
+  </div>
+
+  <!-- Priority -->
+  <div class="field">
+    <label class="label">Priority</label>
+    <div class="priority-bar" id="priority-bar">
+      <button data-p="LOW" data-c="#22c55e">Low</button>
+      <button data-p="MEDIUM" data-c="#eab308" class="sel">Med</button>
+      <button data-p="HIGH" data-c="#f97316">High</button>
+      <button data-p="CRITICAL" data-c="#ef4444">Crit</button>
+    </div>
+  </div>
+
+  <!-- Description -->
+  <div class="field">
+    <label class="label">Issue Description</label>
+    <div class="input-wrap" id="desc-wrap">
+      <textarea placeholder="Describe the issue..." id="inp-desc" rows="3"></textarea>
+    </div>
+  </div>
+
+  <!-- Image Upload -->
+  <div class="field">
+    <label class="label">Attachments</label>
+    <div class="upload-zone" id="upload-zone">
+      <div style="color:#64748b;font-size:.75rem;font-weight:500">Click to attach screenshots or photos</div>
+      <div style="color:#334155;font-size:.6rem;margin-top:.15rem">PNG, JPG — forwarded to MaintainX</div>
+    </div>
+    <input type="file" id="file-input" accept="image/*" multiple style="display:none">
+    <div class="upload-preview" id="upload-preview"></div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary" id="summary" style="display:none">
+    <div class="stitle">Selection</div>
+    <div class="row" id="summary-content"></div>
+  </div>
+
+  <!-- Submit -->
+  <button class="submit-btn inactive" id="submit-btn" disabled>Create Work Order</button>
+  <div class="footer">MaintainX via n8n</div>
+</div>
+
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// CONFIGURATION — UPDATE THESE
+// ═══════════════════════════════════════════
+const CONFIG = {
+  // Your n8n webhook URL for WO submission (Workflow 2)
+  webhookUrl: "https://your-n8n-domain.com/webhook/teams-maintainx-wo",
+
+  // URL to the assets JSON file (served by nginx alongside this HTML)
+  assetsUrl: "./assets.json",
+
+  // Set to true once your n8n cache endpoint is live, then data refreshes automatically
+  // When false, uses the static assets.json file
+  useLiveCache: false,
+  liveCacheUrl: "https://your-n8n-domain.com/webhook/maintainx-cache",
+};
+
+// ═══════════════════════════════════════════
+// DATA — Locations embedded (small), Assets loaded from file
+// ═══════════════════════════════════════════
+let LOCATIONS = [];
+let ASSETS = [];
+let state = {
+  selectedLoc: null,
+  selectedAsset: null,
+  priority: "MEDIUM",
+  images: [],
+  submitting: false,
+};
+
+// Locations are small enough to embed directly
+const EMBEDDED_LOCATIONS = [{"i":"4572595","n":"Apache Corporation"},{"i":"4572596","n":"Verhalen 1 1.5T"},{"i":"4572597","n":"Verhalen 2 1.5T"},{"i":"4572598","n":"Verhalen 1T"},{"i":"4572599","n":"Bad Brains"},{"i":"4572600","n":"Chevron"},{"i":"4572601","n":"Aspen 1"},{"i":"4572602","n":"Aspen 2"},{"i":"4572603","n":"Civitas Resources"},{"i":"4572604","n":"Talco"},{"i":"4572605","n":"Yada"},{"i":"4572606","n":"Mulva A"},{"i":"4572607","n":"Mulva B"},{"i":"4572608","n":"Queen Robyn"},{"i":"4572609","n":"Continental Resources"},{"i":"4572610","n":"Tree State"},{"i":"4572611","n":"Coterra Energy"},{"i":"4572612","n":"Golden Tee"},{"i":"4572613","n":"Carnival"},{"i":"4572614","n":"Alpha"},{"i":"4572615","n":"Greenlight 1"},{"i":"4572616","n":"Greenlight 2"},{"i":"4572617","n":"Paul Foster"},{"i":"4572618","n":"LOE 1"},{"i":"4572619","n":"LOE 2"},{"i":"4572620","n":"FMM"},{"i":"4572621","n":"Colorado 1"},{"i":"4572622","n":"Colorado 2"},{"i":"4572623","n":"Tatanka 1"},{"i":"4572624","n":"Tatanka 2"},{"i":"4572625","n":"Mirror 1"},{"i":"4572626","n":"Mirror 2"},{"i":"4572627","n":"Forge"},{"i":"4572628","n":"Pearl Valley"},{"i":"4572629","n":"Hamon"},{"i":"4572630","n":"Spyglass"},{"i":"4572631","n":"Crescent Energy"},{"i":"4572632","n":"Full Nelson"},{"i":"4572633","n":"Affirmed"},{"i":"4572634","n":"Stork"},{"i":"4572635","n":"Otter"},{"i":"4572636","n":"John J. Bush"},{"i":"4572637","n":"Devon Energy"},{"i":"4572638","n":"Billiken 6 CTB 1"},{"i":"4572639","n":"Ragin Cajun 4"},{"i":"4572640","n":"Muskie 5"},{"i":"4572641","n":"Muskie 4"},{"i":"4572642","n":"Ragin Cajun 2"},{"i":"4572643","n":"EOG Resources"},{"i":"4572644","n":"Date 14"},{"i":"4572645","n":"Naylor Jones 38"},{"i":"4572646","n":"Naylor Jones 55"},{"i":"4572647","n":"Ringo"},{"i":"4572648","n":"Greenlake Energy"},{"i":"4572649","n":"No Risk It"},{"i":"4572650","n":"Mewbourne Oil"},{"i":"4572651","n":"Double Stamp Sea Bass"},{"i":"4572652","n":"OXY"},{"i":"4572653","n":"Powell 9 1.5T"},{"i":"4572654","n":"Powell 9 Ultra"},{"i":"4572655","n":"Falcon Ridge"},{"i":"4572656","n":"Elk"},{"i":"4572657","n":"Permian Resources"},{"i":"4572658","n":"Jade West"},{"i":"4572659","n":"Bridgestate"},{"i":"4572660","n":"Widow Jane"},{"i":"4572661","n":"Heaven Hill"},{"i":"4572662","n":"17 North"},{"i":"4572663","n":"Petro Hunt"},{"i":"4572664","n":"Pronghorn"},{"i":"4572665","n":"Cosmo"},{"i":"4572666","n":"Four Points"},{"i":"4572667","n":"Penner"},{"i":"4572668","n":"Hilcorp - Barker Creek"},{"i":"4572669","n":"Remote Support"},{"i":"4572670","n":"BKRF - BDR"},{"i":"4572671","n":"Streamline Innovations"},{"i":"4572672","n":"Odessa Warehouse"},{"i":"4572673","n":"I&E TRK 2947 | ALEXANDER"},{"i":"4572674","n":"MECH TRK 7965 | CORRAL"},{"i":"4572675","n":"I&E TRK 9922 | COUSSAN"},{"i":"4572676","n":"I&E TRK 4867 | THOMPSON"},{"i":"4572677","n":"I&E TRK 9408 | VACANT"},{"i":"4572678","n":"I&E TRK 9328 | BOWDEN"},{"i":"4572679","n":"MECH TRK 0666 | ZERANGUE"},{"i":"4572680","n":"I&E TRK 4929 | AVALOS"},{"i":"4572681","n":"I&E TRK 8429 | MONTOYA"},{"i":"4572682","n":"CNX | Widow Jane"},{"i":"4572683","n":"CNX | Talco"},{"i":"4572684","n":"CNX | Greenlight"},{"i":"4572685","n":"CNX | Bridgestate"},{"i":"4572686","n":"CNX | Powell"},{"i":"4572687","n":"VF Petroleum"},{"i":"4572688","n":"Cache River"},{"i":"4572689","n":"XTO Energy"},{"i":"4572690","n":"Rhaegal 1"},{"i":"4572691","n":"Rhaegal 2"},{"i":"4572692","n":"Scarlet 1"},{"i":"4572693","n":"Scarlet 2"},{"i":"4572694","n":"Patricia"},{"i":"4572695","n":"Mims"},{"i":"4667199","n":"Inactive Assets"},{"i":"4667202","n":"OWH - Muskie 5"}];
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+async function init() {
+  LOCATIONS = EMBEDDED_LOCATIONS.map(l => ({ id: l.i, name: l.n }));
+
+  // Load assets
+  try {
+    let data;
+    if (CONFIG.useLiveCache) {
+      const res = await fetch(CONFIG.liveCacheUrl);
+      data = await res.json();
+      LOCATIONS = (data.locations || []).map(l => ({ id: l.id || l.i, name: l.name || l.n }));
+      ASSETS = (data.assets || []).map(a => ({ id: a.id || a.i, name: a.name || a.n, locTag: a.locTag || a.t || "" }));
+    } else {
+      const res = await fetch(CONFIG.assetsUrl);
+      const arr = await res.json();
+      ASSETS = arr.map(a => ({ id: a.i, name: a.n, locTag: a.t || "" }));
+    }
+  } catch (e) {
+    console.warn("Failed to load assets:", e);
+  }
+
+  document.getElementById("data-status").textContent =
+    `${LOCATIONS.length} locations / ${ASSETS.length} assets loaded`;
+
+  setupEventListeners();
+}
+
+// ═══════════════════════════════════════════
+// FUZZY SEARCH
+// ═══════════════════════════════════════════
+function fuzzySearch(query, items, limit = 12) {
+  if (!query || query.length < 1) return [];
+  const q = query.toLowerCase();
+  const results = [];
+  for (const item of items) {
+    const n = (item.name || "").toLowerCase();
+    const t = (item.locTag || "").toLowerCase();
+    let score = 0;
+    if (n === q) score = 100;
+    else if (n.startsWith(q)) score = 80;
+    else if (n.includes(q)) score = 60;
+    else if (t && t.startsWith(q)) score = 40;
+    else if (t && t.includes(q)) score = 20;
+    if (score > 0) results.push({ item, score });
+  }
+  results.sort((a, b) => b.score - a.score);
+  return results.slice(0, limit).map(r => r.item);
+}
+
+// ═══════════════════════════════════════════
+// DROPDOWN RENDERING
+// ═══════════════════════════════════════════
+function renderDropdown(containerId, items, onSelect) {
+  const dd = document.getElementById(containerId);
+  dd.innerHTML = "";
+  if (items.length === 0) { dd.classList.remove("open"); return; }
+
+  items.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "item";
+    let html = `<span class="name">${escHtml(item.name)}</span>`;
+    if (item.locTag) html += `<span class="tag">${escHtml(item.locTag)}</span>`;
+    div.innerHTML = html;
+    div.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      onSelect(item);
+      dd.classList.remove("open");
+    });
+    dd.appendChild(div);
+  });
+  dd.classList.add("open");
+}
+
+function escHtml(s) {
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ═══════════════════════════════════════════
+// EVENT LISTENERS
+// ═══════════════════════════════════════════
+function setupEventListeners() {
+  const inpName = document.getElementById("inp-name");
+  const inpLoc = document.getElementById("inp-loc");
+  const inpAsset = document.getElementById("inp-asset");
+  const inpDesc = document.getElementById("inp-desc");
+  const locClear = document.getElementById("loc-clear");
+  const assetClear = document.getElementById("asset-clear");
+
+  // Focus styling
+  ["name-wrap","loc-wrap","asset-wrap","desc-wrap"].forEach(id => {
+    const wrap = document.getElementById(id);
+    const inp = wrap.querySelector("input,textarea");
+    if (!inp) return;
+    inp.addEventListener("focus", () => wrap.classList.add("focused"));
+    inp.addEventListener("blur", () => wrap.classList.remove("focused"));
+  });
+
+  // Location search
+  inpLoc.addEventListener("input", () => {
+    const q = inpLoc.value;
+    locClear.style.display = q ? "flex" : "none";
+    const results = fuzzySearch(q, LOCATIONS);
+    renderDropdown("loc-dropdown", results, selectLocation);
+  });
+  inpLoc.addEventListener("focus", () => {
+    if (inpLoc.value) {
+      const results = fuzzySearch(inpLoc.value, LOCATIONS);
+      renderDropdown("loc-dropdown", results, selectLocation);
+    }
+  });
+  inpLoc.addEventListener("blur", () => {
+    setTimeout(() => document.getElementById("loc-dropdown").classList.remove("open"), 150);
+  });
+  locClear.addEventListener("click", () => {
+    inpLoc.value = "";
+    locClear.style.display = "none";
+    state.selectedLoc = null;
+    clearAsset();
+    updateSummary();
+    updateSubmitBtn();
+  });
+
+  // Asset search
+  inpAsset.addEventListener("input", () => {
+    const q = inpAsset.value;
+    assetClear.style.display = q ? "flex" : "none";
+    const results = fuzzySearch(q, ASSETS);
+    renderDropdown("asset-dropdown", results, selectAsset);
+  });
+  inpAsset.addEventListener("focus", () => {
+    if (inpAsset.value) {
+      const results = fuzzySearch(inpAsset.value, ASSETS);
+      renderDropdown("asset-dropdown", results, selectAsset);
+    }
+  });
+  inpAsset.addEventListener("blur", () => {
+    setTimeout(() => document.getElementById("asset-dropdown").classList.remove("open"), 150);
+  });
+  assetClear.addEventListener("click", () => {
+    clearAsset();
+    updateSummary();
+    updateSubmitBtn();
+  });
+
+  // Priority
+  document.getElementById("priority-bar").addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    state.priority = btn.dataset.p;
+    updatePriorityUI();
+  });
+  updatePriorityUI();
+
+  // Description
+  inpDesc.addEventListener("input", updateSubmitBtn);
+  inpName.addEventListener("input", updateSubmitBtn);
+
+  // Image upload
+  document.getElementById("upload-zone").addEventListener("click", () => {
+    document.getElementById("file-input").click();
+  });
+  document.getElementById("file-input").addEventListener("change", handleFileSelect);
+
+  // Submit
+  document.getElementById("submit-btn").addEventListener("click", handleSubmit);
+
+  // Close dropdowns on outside click
+  document.addEventListener("click", (e) => {
+    if (!document.getElementById("loc-field").contains(e.target))
+      document.getElementById("loc-dropdown").classList.remove("open");
+    if (!document.getElementById("asset-field").contains(e.target))
+      document.getElementById("asset-dropdown").classList.remove("open");
+  });
+}
+
+function selectLocation(loc) {
+  state.selectedLoc = loc;
+  document.getElementById("inp-loc").value = loc.name;
+  document.getElementById("loc-clear").style.display = "flex";
+
+  // Enable asset field
+  const assetWrap = document.getElementById("asset-wrap");
+  assetWrap.classList.remove("disabled");
+  const inpAsset = document.getElementById("inp-asset");
+  inpAsset.disabled = false;
+  inpAsset.placeholder = "Type to search assets...";
+  inpAsset.value = "";
+  state.selectedAsset = null;
+
+  updateSummary();
+  updateSubmitBtn();
+  inpAsset.focus();
+}
+
+function selectAsset(asset) {
+  state.selectedAsset = asset;
+  document.getElementById("inp-asset").value = asset.name;
+  document.getElementById("asset-clear").style.display = "flex";
+  updateSummary();
+  updateSubmitBtn();
+}
+
+function clearAsset() {
+  state.selectedAsset = null;
+  const inp = document.getElementById("inp-asset");
+  inp.value = "";
+  document.getElementById("asset-clear").style.display = "none";
+  if (!state.selectedLoc) {
+    document.getElementById("asset-wrap").classList.add("disabled");
+    inp.disabled = true;
+    inp.placeholder = "Select a location first";
+  }
+}
+
+function updatePriorityUI() {
+  const btns = document.querySelectorAll("#priority-bar button");
+  btns.forEach(btn => {
+    const isActive = btn.dataset.p === state.priority;
+    const c = btn.dataset.c;
+    btn.style.borderColor = isActive ? c : "rgba(255,255,255,0.06)";
+    btn.style.background = isActive ? c + "12" : "rgba(255,255,255,0.02)";
+    btn.style.color = isActive ? c : "#475569";
+  });
+}
+
+function updateSummary() {
+  const el = document.getElementById("summary");
+  const content = document.getElementById("summary-content");
+  if (!state.selectedLoc && !state.selectedAsset) {
+    el.style.display = "none";
+    return;
+  }
+  el.style.display = "block";
+  let html = "";
+  if (state.selectedLoc) html += `<div><span class="slbl">LOC</span> <strong>${escHtml(state.selectedLoc.name)}</strong></div>`;
+  if (state.selectedAsset) {
+    html += `<div><span class="slbl">AST</span> <strong>${escHtml(state.selectedAsset.name)}</strong>`;
+    if (state.selectedAsset.locTag) html += `<span style="color:#334155;font-size:.65rem;margin-left:.3rem">${escHtml(state.selectedAsset.locTag)}</span>`;
+    html += `</div>`;
+  }
+  if (state.images.length > 0) html += `<div><span class="slbl">IMG</span> ${state.images.length} file${state.images.length > 1 ? "s" : ""}</div>`;
+  content.innerHTML = html;
+}
+
+function updateSubmitBtn() {
+  const btn = document.getElementById("submit-btn");
+  const name = document.getElementById("inp-name").value.trim();
+  const desc = document.getElementById("inp-desc").value.trim();
+  const valid = state.selectedLoc && state.selectedAsset && desc.length >= 5 && name.length > 0 && !state.submitting;
+  btn.disabled = !valid;
+  btn.className = "submit-btn " + (valid ? "active" : "inactive");
+}
+
+// ═══════════════════════════════════════════
+// IMAGE HANDLING
+// ═══════════════════════════════════════════
+function handleFileSelect(e) {
+  const files = Array.from(e.target.files || []);
+  files.forEach(file => {
+    if (!file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      state.images.push({ name: file.name, type: file.type, data: ev.target.result });
+      renderImagePreviews();
+      updateSummary();
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value = "";
+}
+
+function renderImagePreviews() {
+  const container = document.getElementById("upload-preview");
+  container.innerHTML = "";
+  state.images.forEach((img, i) => {
+    const div = document.createElement("div");
+    div.className = "upload-thumb";
+    div.innerHTML = `<img src="${img.data}" alt=""><button class="rm" data-idx="${i}">x</button>`;
+    div.querySelector(".rm").addEventListener("click", (e) => {
+      e.stopPropagation();
+      state.images.splice(i, 1);
+      renderImagePreviews();
+      updateSummary();
+    });
+    container.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════
+async function handleSubmit() {
+  if (state.submitting) return;
+  state.submitting = true;
+  const btn = document.getElementById("submit-btn");
+  btn.textContent = "Creating...";
+  updateSubmitBtn();
+  showStatus("submitting", "Creating work order...");
+
+  const payload = {
+    locationId: state.selectedLoc.id,
+    locationName: state.selectedLoc.name,
+    assetId: state.selectedAsset.id,
+    assetName: state.selectedAsset.name,
+    description: document.getElementById("inp-desc").value.trim(),
+    priority: state.priority,
+    submittedBy: document.getElementById("inp-name").value.trim(),
+    sourceType: "webform",
+    action: "createWorkOrder",
+    attachments: state.images.map(img => ({ name: img.name, type: img.type, data: img.data })),
+  };
+
+  try {
+    const res = await fetch(CONFIG.webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    state.submitting = false;
+    btn.textContent = "Create Work Order";
+
+    if (data.status === "duplicate_found") {
+      showStatus("duplicate", `Duplicate — WO #${data.existingWoId || "?"} already open`);
+    } else if (data.workOrderId || res.ok) {
+      showStatus("success", `WO #${data.workOrderId || "OK"} created`);
+    } else {
+      showStatus("error", "Submission failed — check webhook");
+    }
+  } catch (err) {
+    state.submitting = false;
+    btn.textContent = "Create Work Order";
+    showStatus("error", "Network error — check connection");
+  }
+  updateSubmitBtn();
+}
+
+function showStatus(type, text) {
+  const bar = document.getElementById("status-bar");
+  const colors = {
+    submitting: { bg: "rgba(34,197,94,0.05)", c: "#4ade80" },
+    success: { bg: "rgba(34,197,94,0.07)", c: "#4ade80" },
+    error: { bg: "rgba(239,68,68,0.07)", c: "#f87171" },
+    duplicate: { bg: "rgba(234,179,8,0.07)", c: "#facc15" },
+  };
+  const col = colors[type] || colors.error;
+  let html = `<div class="status-bar" style="background:${col.bg}">`;
+  html += `<span style="color:${col.c};font-size:.78rem;font-weight:600">${escHtml(text)}</span>`;
+  if (type !== "submitting") {
+    const label = type === "success" ? "New" : "Retry";
+    html += `<button class="btn" style="color:${col.c};border-color:${col.c}25" onclick="resetForm()">${label}</button>`;
+  }
+  html += `</div>`;
+  bar.innerHTML = html;
+}
+
+function resetForm() {
+  document.getElementById("inp-name").value = "";
+  document.getElementById("inp-loc").value = "";
+  document.getElementById("inp-asset").value = "";
+  document.getElementById("inp-desc").value = "";
+  document.getElementById("loc-clear").style.display = "none";
+  document.getElementById("asset-clear").style.display = "none";
+  document.getElementById("status-bar").innerHTML = "";
+  state.selectedLoc = null;
+  state.selectedAsset = null;
+  state.priority = "MEDIUM";
+  state.images = [];
+  state.submitting = false;
+  clearAsset();
+  updatePriorityUI();
+  updateSummary();
+  updateSubmitBtn();
+  renderImagePreviews();
+}
+
+// Boot
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
