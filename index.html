@@ -76,18 +76,15 @@ h1{font-size:1.3rem;font-weight:700;color:#f1f5f9}
 <div class="page">
 <div class="wrap">
 
-<!-- Header -->
 <div style="margin-bottom:1.25rem">
   <div class="badge">Streamline Innovations</div>
   <h1>Work Order Portal</h1>
   <p class="subtitle" id="data-status">Connecting to MaintainX...</p>
 </div>
 
-<!-- Card -->
 <div class="card">
   <div id="status-bar"></div>
 
-  <!-- Name -->
   <div class="field">
     <label class="label">Submitted By</label>
     <div class="input-wrap" id="name-wrap">
@@ -95,7 +92,6 @@ h1{font-size:1.3rem;font-weight:700;color:#f1f5f9}
     </div>
   </div>
 
-  <!-- Location -->
   <div class="field" id="loc-field">
     <label class="label">Location</label>
     <div class="input-wrap" id="loc-wrap">
@@ -105,7 +101,6 @@ h1{font-size:1.3rem;font-weight:700;color:#f1f5f9}
     <div class="dropdown" id="loc-dropdown"></div>
   </div>
 
-  <!-- Asset -->
   <div class="field" id="asset-field">
     <label class="label">Asset</label>
     <div class="input-wrap disabled" id="asset-wrap">
@@ -115,7 +110,6 @@ h1{font-size:1.3rem;font-weight:700;color:#f1f5f9}
     <div class="dropdown" id="asset-dropdown"></div>
   </div>
 
-  <!-- Priority -->
   <div class="field">
     <label class="label">Priority</label>
     <div class="priority-bar" id="priority-bar">
@@ -126,7 +120,6 @@ h1{font-size:1.3rem;font-weight:700;color:#f1f5f9}
     </div>
   </div>
 
-  <!-- Description -->
   <div class="field">
     <label class="label">Issue Description</label>
     <div class="input-wrap" id="desc-wrap">
@@ -134,7 +127,6 @@ h1{font-size:1.3rem;font-weight:700;color:#f1f5f9}
     </div>
   </div>
 
-  <!-- Image Upload -->
   <div class="field">
     <label class="label">Attachments</label>
     <div class="upload-zone" id="upload-zone">
@@ -145,13 +137,11 @@ h1{font-size:1.3rem;font-weight:700;color:#f1f5f9}
     <div class="upload-preview" id="upload-preview"></div>
   </div>
 
-  <!-- Summary -->
   <div class="summary" id="summary" style="display:none">
     <div class="stitle">Selection</div>
     <div class="row" id="summary-content"></div>
   </div>
 
-  <!-- Submit -->
   <button class="submit-btn inactive" id="submit-btn" disabled>Create Work Order</button>
   <div class="footer">MaintainX via n8n</div>
 </div>
@@ -160,25 +150,13 @@ h1{font-size:1.3rem;font-weight:700;color:#f1f5f9}
 </div>
 
 <script>
-// ═══════════════════════════════════════════
-// CONFIGURATION — UPDATE THESE
-// ═══════════════════════════════════════════
 const CONFIG = {
-  // Your n8n webhook URL for WO submission (Workflow 2)
-  webhookUrl: "https://your-n8n-domain.com/webhook/teams-maintainx-wo",
-
-  // URL to the assets JSON file (served by nginx alongside this HTML)
+  webhookUrl: "/api/workorder",
   assetsUrl: "./assets.json",
-
-  // Set to true once your n8n cache endpoint is live, then data refreshes automatically
-  // When false, uses the static assets.json file
   useLiveCache: false,
-  liveCacheUrl: "https://your-n8n-domain.com/webhook/maintainx-cache",
+  liveCacheUrl: "/webhook/maintainx-cache",
 };
 
-// ═══════════════════════════════════════════
-// DATA — Locations embedded (small), Assets loaded from file
-// ═══════════════════════════════════════════
 let LOCATIONS = [];
 let ASSETS = [];
 let state = {
@@ -189,16 +167,11 @@ let state = {
   submitting: false,
 };
 
-// Locations are small enough to embed directly
 const EMBEDDED_LOCATIONS = [{"i":"4572595","n":"Apache Corporation"},{"i":"4572596","n":"Verhalen 1 1.5T"},{"i":"4572597","n":"Verhalen 2 1.5T"},{"i":"4572598","n":"Verhalen 1T"},{"i":"4572599","n":"Bad Brains"},{"i":"4572600","n":"Chevron"},{"i":"4572601","n":"Aspen 1"},{"i":"4572602","n":"Aspen 2"},{"i":"4572603","n":"Civitas Resources"},{"i":"4572604","n":"Talco"},{"i":"4572605","n":"Yada"},{"i":"4572606","n":"Mulva A"},{"i":"4572607","n":"Mulva B"},{"i":"4572608","n":"Queen Robyn"},{"i":"4572609","n":"Continental Resources"},{"i":"4572610","n":"Tree State"},{"i":"4572611","n":"Coterra Energy"},{"i":"4572612","n":"Golden Tee"},{"i":"4572613","n":"Carnival"},{"i":"4572614","n":"Alpha"},{"i":"4572615","n":"Greenlight 1"},{"i":"4572616","n":"Greenlight 2"},{"i":"4572617","n":"Paul Foster"},{"i":"4572618","n":"LOE 1"},{"i":"4572619","n":"LOE 2"},{"i":"4572620","n":"FMM"},{"i":"4572621","n":"Colorado 1"},{"i":"4572622","n":"Colorado 2"},{"i":"4572623","n":"Tatanka 1"},{"i":"4572624","n":"Tatanka 2"},{"i":"4572625","n":"Mirror 1"},{"i":"4572626","n":"Mirror 2"},{"i":"4572627","n":"Forge"},{"i":"4572628","n":"Pearl Valley"},{"i":"4572629","n":"Hamon"},{"i":"4572630","n":"Spyglass"},{"i":"4572631","n":"Crescent Energy"},{"i":"4572632","n":"Full Nelson"},{"i":"4572633","n":"Affirmed"},{"i":"4572634","n":"Stork"},{"i":"4572635","n":"Otter"},{"i":"4572636","n":"John J. Bush"},{"i":"4572637","n":"Devon Energy"},{"i":"4572638","n":"Billiken 6 CTB 1"},{"i":"4572639","n":"Ragin Cajun 4"},{"i":"4572640","n":"Muskie 5"},{"i":"4572641","n":"Muskie 4"},{"i":"4572642","n":"Ragin Cajun 2"},{"i":"4572643","n":"EOG Resources"},{"i":"4572644","n":"Date 14"},{"i":"4572645","n":"Naylor Jones 38"},{"i":"4572646","n":"Naylor Jones 55"},{"i":"4572647","n":"Ringo"},{"i":"4572648","n":"Greenlake Energy"},{"i":"4572649","n":"No Risk It"},{"i":"4572650","n":"Mewbourne Oil"},{"i":"4572651","n":"Double Stamp Sea Bass"},{"i":"4572652","n":"OXY"},{"i":"4572653","n":"Powell 9 1.5T"},{"i":"4572654","n":"Powell 9 Ultra"},{"i":"4572655","n":"Falcon Ridge"},{"i":"4572656","n":"Elk"},{"i":"4572657","n":"Permian Resources"},{"i":"4572658","n":"Jade West"},{"i":"4572659","n":"Bridgestate"},{"i":"4572660","n":"Widow Jane"},{"i":"4572661","n":"Heaven Hill"},{"i":"4572662","n":"17 North"},{"i":"4572663","n":"Petro Hunt"},{"i":"4572664","n":"Pronghorn"},{"i":"4572665","n":"Cosmo"},{"i":"4572666","n":"Four Points"},{"i":"4572667","n":"Penner"},{"i":"4572668","n":"Hilcorp - Barker Creek"},{"i":"4572669","n":"Remote Support"},{"i":"4572670","n":"BKRF - BDR"},{"i":"4572671","n":"Streamline Innovations"},{"i":"4572672","n":"Odessa Warehouse"},{"i":"4572673","n":"I&E TRK 2947 | ALEXANDER"},{"i":"4572674","n":"MECH TRK 7965 | CORRAL"},{"i":"4572675","n":"I&E TRK 9922 | COUSSAN"},{"i":"4572676","n":"I&E TRK 4867 | THOMPSON"},{"i":"4572677","n":"I&E TRK 9408 | VACANT"},{"i":"4572678","n":"I&E TRK 9328 | BOWDEN"},{"i":"4572679","n":"MECH TRK 0666 | ZERANGUE"},{"i":"4572680","n":"I&E TRK 4929 | AVALOS"},{"i":"4572681","n":"I&E TRK 8429 | MONTOYA"},{"i":"4572682","n":"CNX | Widow Jane"},{"i":"4572683","n":"CNX | Talco"},{"i":"4572684","n":"CNX | Greenlight"},{"i":"4572685","n":"CNX | Bridgestate"},{"i":"4572686","n":"CNX | Powell"},{"i":"4572687","n":"VF Petroleum"},{"i":"4572688","n":"Cache River"},{"i":"4572689","n":"XTO Energy"},{"i":"4572690","n":"Rhaegal 1"},{"i":"4572691","n":"Rhaegal 2"},{"i":"4572692","n":"Scarlet 1"},{"i":"4572693","n":"Scarlet 2"},{"i":"4572694","n":"Patricia"},{"i":"4572695","n":"Mims"},{"i":"4667199","n":"Inactive Assets"},{"i":"4667202","n":"OWH - Muskie 5"}];
 
-// ═══════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════
 async function init() {
   LOCATIONS = EMBEDDED_LOCATIONS.map(l => ({ id: l.i, name: l.n }));
 
-  // Load assets
   try {
     let data;
     if (CONFIG.useLiveCache) {
@@ -221,9 +194,6 @@ async function init() {
   setupEventListeners();
 }
 
-// ═══════════════════════════════════════════
-// FUZZY SEARCH
-// ═══════════════════════════════════════════
 function fuzzySearch(query, items, limit = 12) {
   if (!query || query.length < 1) return [];
   const q = query.toLowerCase();
@@ -243,9 +213,6 @@ function fuzzySearch(query, items, limit = 12) {
   return results.slice(0, limit).map(r => r.item);
 }
 
-// ═══════════════════════════════════════════
-// DROPDOWN RENDERING
-// ═══════════════════════════════════════════
 function renderDropdown(containerId, items, onSelect) {
   const dd = document.getElementById(containerId);
   dd.innerHTML = "";
@@ -273,9 +240,6 @@ function escHtml(s) {
   return d.innerHTML;
 }
 
-// ═══════════════════════════════════════════
-// EVENT LISTENERS
-// ═══════════════════════════════════════════
 function setupEventListeners() {
   const inpName = document.getElementById("inp-name");
   const inpLoc = document.getElementById("inp-loc");
@@ -284,7 +248,6 @@ function setupEventListeners() {
   const locClear = document.getElementById("loc-clear");
   const assetClear = document.getElementById("asset-clear");
 
-  // Focus styling
   ["name-wrap","loc-wrap","asset-wrap","desc-wrap"].forEach(id => {
     const wrap = document.getElementById(id);
     const inp = wrap.querySelector("input,textarea");
@@ -293,7 +256,6 @@ function setupEventListeners() {
     inp.addEventListener("blur", () => wrap.classList.remove("focused"));
   });
 
-  // Location search
   inpLoc.addEventListener("input", () => {
     const q = inpLoc.value;
     locClear.style.display = q ? "flex" : "none";
@@ -318,7 +280,6 @@ function setupEventListeners() {
     updateSubmitBtn();
   });
 
-  // Asset search
   inpAsset.addEventListener("input", () => {
     const q = inpAsset.value;
     assetClear.style.display = q ? "flex" : "none";
@@ -340,7 +301,6 @@ function setupEventListeners() {
     updateSubmitBtn();
   });
 
-  // Priority
   document.getElementById("priority-bar").addEventListener("click", (e) => {
     const btn = e.target.closest("button");
     if (!btn) return;
@@ -349,20 +309,16 @@ function setupEventListeners() {
   });
   updatePriorityUI();
 
-  // Description
   inpDesc.addEventListener("input", updateSubmitBtn);
   inpName.addEventListener("input", updateSubmitBtn);
 
-  // Image upload
   document.getElementById("upload-zone").addEventListener("click", () => {
     document.getElementById("file-input").click();
   });
   document.getElementById("file-input").addEventListener("change", handleFileSelect);
 
-  // Submit
   document.getElementById("submit-btn").addEventListener("click", handleSubmit);
 
-  // Close dropdowns on outside click
   document.addEventListener("click", (e) => {
     if (!document.getElementById("loc-field").contains(e.target))
       document.getElementById("loc-dropdown").classList.remove("open");
@@ -376,7 +332,6 @@ function selectLocation(loc) {
   document.getElementById("inp-loc").value = loc.name;
   document.getElementById("loc-clear").style.display = "flex";
 
-  // Enable asset field
   const assetWrap = document.getElementById("asset-wrap");
   assetWrap.classList.remove("disabled");
   const inpAsset = document.getElementById("inp-asset");
@@ -449,9 +404,6 @@ function updateSubmitBtn() {
   btn.className = "submit-btn " + (valid ? "active" : "inactive");
 }
 
-// ═══════════════════════════════════════════
-// IMAGE HANDLING
-// ═══════════════════════════════════════════
 function handleFileSelect(e) {
   const files = Array.from(e.target.files || []);
   files.forEach(file => {
@@ -484,9 +436,6 @@ function renderImagePreviews() {
   });
 }
 
-// ═══════════════════════════════════════════
-// SUBMIT
-// ═══════════════════════════════════════════
 async function handleSubmit() {
   if (state.submitting) return;
   state.submitting = true;
@@ -572,7 +521,6 @@ function resetForm() {
   renderImagePreviews();
 }
 
-// Boot
 document.addEventListener("DOMContentLoaded", init);
 </script>
 </body>
