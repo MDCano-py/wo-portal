@@ -1,8 +1,4 @@
 #!/bin/bash
-# ═══════════════════════════════════════════════════════
-# deploy-wo-portal.sh
-# Run this on your EC2 instance after SCPing the wo-portal folder
-# ═══════════════════════════════════════════════════════
 
 set -e
 
@@ -11,7 +7,6 @@ echo "  Work Order Portal — Deployment"
 echo "══════════════════════════════════════"
 echo ""
 
-# ── Step 1: Copy files to web root ──
 echo "[1/4] Creating web directory..."
 sudo mkdir -p /var/www/wo-portal
 sudo cp index.html /var/www/wo-portal/
@@ -20,9 +15,7 @@ sudo chown -R www-data:www-data /var/www/wo-portal
 sudo chmod -R 755 /var/www/wo-portal
 echo "      Files copied to /var/www/wo-portal"
 
-# ── Step 2: Add nginx config ──
 echo "[2/4] Checking nginx config..."
-NGINX_CONF=$(sudo nginx -T 2>/dev/null | grep "server_name" | head -1 | awk '{print $NF}' | tr -d ';')
 echo "      Server name detected: $NGINX_CONF"
 echo ""
 echo "      You need to add the following location block"
@@ -43,14 +36,12 @@ if [ "$answer" != "y" ]; then
     exit 0
 fi
 
-# ── Step 3: Test and reload nginx ──
 echo "[3/4] Testing nginx config..."
 sudo nginx -t
 echo "[3/4] Reloading nginx..."
 sudo nginx -s reload
 echo "      Nginx reloaded"
 
-# ── Step 4: Verify ──
 echo "[4/4] Verifying..."
 echo ""
 echo "══════════════════════════════════════"
